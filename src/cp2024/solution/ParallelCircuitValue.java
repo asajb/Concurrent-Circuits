@@ -5,6 +5,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import cp2024.circuit.CircuitValue;
 
+/*
+ * ParallelCircuitValue implements the CircuitValue interface and provides a parallel implementation of the getValue method.
+ * It uses a Future object to store the result of the computation and provides a getValue method that returns the result.
+ */
 public class ParallelCircuitValue implements CircuitValue {
     private final boolean broken;
     private final Future<Boolean> future;
