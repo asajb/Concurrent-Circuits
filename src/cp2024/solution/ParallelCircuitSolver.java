@@ -19,6 +19,11 @@ import java.util.concurrent.Future;
 import cp2024.circuit.Circuit;
 import cp2024.circuit.CircuitNode;
 
+/*
+ * ParallelCircuitSolver implements the CircuitSolver interface and provides a parallel implementation of the solve method.
+ * It uses an ExecutorService to submit tasks to a thread pool and uses a CompletionService to process the results of these tasks.
+ * The solve method recursively solves the circuit by submitting tasks to the ExecutorService and processing the results using the CompletionService.
+ */
 public class ParallelCircuitSolver implements CircuitSolver {
     private final ExecutorService executorService = Executors.newCachedThreadPool(); // Shared executor
     private volatile boolean acceptComputations = true;
@@ -39,12 +44,14 @@ public class ParallelCircuitSolver implements CircuitSolver {
         return new ParallelCircuitValue(future);
     }
 
+    // The stop method is used to stop the executor service and prevent further computations.
     @Override
     public void stop() {
         acceptComputations = false;
         executorService.shutdownNow();
     }
 
+    // The recursiveSolve method is used to recursively solve the circuit nodes.
     private boolean recursiveSolve(CircuitNode n) throws InterruptedException {
         if (n.getType() == NodeType.LEAF)
             return ((LeafNode) n).getValue();
@@ -62,6 +69,7 @@ public class ParallelCircuitSolver implements CircuitSolver {
         };
     }
 
+    // The solveIF, solveAND, solveOR, solveGT, solveLT, and solveNOT methods are used to solve the circuit nodes based on their type.
     private boolean solveNOT(CircuitNode[] args) throws InterruptedException {
         return !recursiveSolve(args[0]);
     }
@@ -83,6 +91,7 @@ public class ParallelCircuitSolver implements CircuitSolver {
             solveWithThreshold(new CircuitNode[]{args[2]}, 0, true);
     }
 
+    // The solveWithThreshold method is used to solve the circuit nodes based on a threshold value.
     private boolean solveWithThreshold(CircuitNode[] args, int threshold, boolean isGreaterThan) throws InterruptedException {
         CompletionService<Boolean> completionService = new ExecutorCompletionService<>(executorService);
         List<Future<Boolean>> futures = new ArrayList<>();
